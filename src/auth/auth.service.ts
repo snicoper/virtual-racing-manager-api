@@ -8,15 +8,18 @@ export class AuthService {
   constructor(private readonly prisma: PrismaService) {}
 
   async register(dto: RegisterDto) {
+    const normalizedEmail = dto.email.trim().toLowerCase();
+    const normalizedUsername = dto.username.trim();
+
     this.validatePassword(dto.password, dto.confirmPassword);
-    await this.validateUserDoesNotExist(dto.email, dto.username);
+    await this.validateUserDoesNotExist(normalizedEmail, normalizedUsername);
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
     const user = await this.prisma.user.create({
       data: {
-        email: dto.email,
-        username: dto.username,
+        email: normalizedEmail,
+        username: normalizedUsername,
         passwordHash: passwordHash,
       },
     });

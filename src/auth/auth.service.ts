@@ -9,13 +9,12 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const normalizedEmail = dto.email.trim().toLowerCase();
-    const normalizedUsername = dto.username.trim();
+    const normalizedUsername = dto.username.toLocaleLowerCase().trim();
 
     this.validatePassword(dto.password, dto.confirmPassword);
     await this.validateUserDoesNotExist(normalizedEmail, normalizedUsername);
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
-
     const user = await this.prisma.user.create({
       data: {
         email: normalizedEmail,
@@ -41,6 +40,8 @@ export class AuthService {
   }
 
   private async validateUserDoesNotExist(email: string, username: string) {
+    const errors: Record<string, string[]> = {};
+
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ email }, { username }],
@@ -52,20 +53,17 @@ export class AuthService {
     }
 
     if (existingUser.email === email) {
-      throw new BadRequestException({
-        message: 'Validation failed',
-        errors: {
-          email: ['Email is already in use'],
-        },
-      });
+      errors.email = ['Email is already in use'];
     }
 
     if (existingUser.username === username) {
+      errors.username = ['Username is already in use'];
+    }
+
+    if (Object.keys(errors).length > 0) {
       throw new BadRequestException({
         message: 'Validation failed',
-        errors: {
-          username: ['Username is already in use'],
-        },
+        errors: errors,
       });
     }
   }

@@ -4,7 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
-export class AuthService {
+export class RegisterService {
   constructor(private readonly prisma: PrismaService) {}
 
   async register(dto: RegisterDto) {

@@ -10,16 +10,14 @@ export class RegisterService {
 
   async register(dto: RegisterRequest): Promise<RegisterResponse> {
     const normalizedEmail = dto.email.trim().toLowerCase();
-    const normalizedUsername = dto.username.toLocaleLowerCase().trim();
 
     this.validatePassword(dto.password, dto.confirmPassword);
-    await this.validateUserDoesNotExist(normalizedEmail, normalizedUsername);
+    await this.validateUserDoesNotExist(normalizedEmail);
 
     const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = await this.prisma.user.create({
       data: {
         email: normalizedEmail,
-        username: normalizedUsername,
         passwordHash: passwordHash,
       },
     });
@@ -40,15 +38,12 @@ export class RegisterService {
     }
   }
 
-  private async validateUserDoesNotExist(
-    email: string,
-    username: string,
-  ): Promise<void | null> {
+  private async validateUserDoesNotExist(email: string): Promise<void | null> {
     const errors: Record<string, string[]> = {};
 
     const existingUser = await this.prisma.user.findFirst({
       where: {
-        OR: [{ email }, { username }],
+        OR: [{ email }],
       },
     });
 
@@ -58,10 +53,6 @@ export class RegisterService {
 
     if (existingUser.email === email) {
       errors.email = ['Email is already in use'];
-    }
-
-    if (existingUser.username === username) {
-      errors.username = ['Username is already in use'];
     }
 
     if (Object.keys(errors).length > 0) {

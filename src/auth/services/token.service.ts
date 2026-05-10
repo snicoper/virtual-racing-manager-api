@@ -43,7 +43,6 @@ export class TokenService {
     const payload = {
       sub: user.id,
       email: user.email,
-      username: user.username,
     };
 
     return this.jwtService.signAsync(payload);

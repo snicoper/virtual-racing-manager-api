@@ -22,7 +22,6 @@ export class MeService {
     const meResponse: MeResponse = {
       id: user.id,
       email: user.email,
-      username: user.username,
       isActive: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,

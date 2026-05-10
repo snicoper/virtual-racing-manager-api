@@ -1,17 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { AppConfig } from '../../common/config/app.config';
-import { JwtPayload } from '../contracts/jwt-payload.contract';
+import { TokenService } from '../token.service';
 import { LoginRequest } from './login.request';
-import { LoginResponse } from './login.response';
 
 @Injectable()
 export class LoginService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly authService: TokenService,
   ) {}
 
   async login(dto: LoginRequest) {
@@ -40,19 +37,8 @@ export class LoginService {
       });
     }
 
-    const payload: JwtPayload = {
-      sub: user.id,
-      email: user.email,
-      username: user.username,
-    };
+    const tokenResponse = await this.authService.issueTokens(user);
 
-    const accessToken = await this.jwtService.signAsync(payload);
-    const expiresIn = AppConfig.jwt.expiresInMinutes * 60;
-    const loginResult: LoginResponse = {
-      accessToken,
-      expiresIn,
-    };
-
-    return loginResult;
+    return tokenResponse;
   }
 }

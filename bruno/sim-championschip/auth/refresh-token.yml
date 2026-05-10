@@ -1,17 +1,16 @@
 info:
-  name: login
+  name: refresh-token
   type: http
-  seq: 2
+  seq: 4
 
 http:
   method: POST
-  url: "{{base-url}}/auth/login"
+  url: "{{base-url}}/auth/refresh-token"
   body:
     type: json
     data: |-
       {
-        "email": "salva@example.com",
-        "password": "Password123!"
+        "refreshToken": "{{refreshToken}}"
       }
   auth: inherit
 

@@ -4,9 +4,11 @@ import type { SignOptions } from 'jsonwebtoken';
 import { AppConfig } from '../common/config/app.config';
 import { AuthController } from './auth.controller';
 import { LoginService } from './login/login.service';
+import { MeService } from './me/me.service';
+import { RefreshTokenService } from './refresh-token/refresh-token.service';
 import { RegisterService } from './register/register.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { MeService } from './me/me.service';
+import { TokenService } from './token.service';
 
 const jwtExpiresIn =
   `${AppConfig.jwt.expiresInMinutes}m` as SignOptions['expiresIn'];
@@ -21,6 +23,13 @@ const jwtExpiresIn =
     }),
   ],
   controllers: [AuthController],
-  providers: [RegisterService, LoginService, JwtStrategy, MeService],
+  providers: [
+    RegisterService,
+    LoginService,
+    JwtStrategy,
+    MeService,
+    RefreshTokenService,
+    TokenService,
+  ],
 })
 export class AuthModule {}

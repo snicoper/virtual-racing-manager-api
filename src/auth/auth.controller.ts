@@ -13,6 +13,8 @@ import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { LoginRequest } from './login/login.request';
 import { LoginService } from './login/login.service';
 import { MeService } from './me/me.service';
+import { RefreshTokenRequest } from './refresh-token/refresh-token.request';
+import { RefreshTokenService } from './refresh-token/refresh-token.service';
 import { RegisterDto } from './register/register.dto';
 import { RegisterService } from './register/register.service';
 
@@ -22,6 +24,7 @@ export class AuthController {
     private readonly registerService: RegisterService,
     private readonly loginService: LoginService,
     private readonly meService: MeService,
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   @Get('me')
@@ -39,5 +42,17 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   login(@Body() dto: LoginRequest) {
     return this.loginService.login(dto);
+  }
+
+  @Post('refresh-token')
+  @UseGuards(JwtAuthGuard)
+  refresh(
+    @Req() req: Request & { user: JwtPayload },
+    @Body() dto: RefreshTokenRequest,
+  ) {
+    return this.refreshTokenService.refreshToken(
+      dto.refreshToken,
+      req.user.sub,
+    );
   }
 }

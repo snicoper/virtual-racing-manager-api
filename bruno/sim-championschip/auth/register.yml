@@ -10,12 +10,33 @@ http:
     type: json
     data: |-
       {
-        "email": "NitrO@example.com",
-        "username": "NitrO",
-        "password": "Password1234!",
-        "confirmPassword": "Password1234!"
+        "email": "{{registerEmail}}",
+        "username": "{{registerUsername}}",
+        "password": "Password123!",
+        "confirmPassword": "Password123!"
       }
   auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const timestamp = Date.now();
+
+        bru.setVar('registerEmail', `test-${timestamp}@example.com`);
+        bru.setVar('registerUsername', `test-${timestamp}`);
+    - type: tests
+      code: |-
+        const data = res.getBody();
+
+        test("Should register a new user", () => {
+          expect(res.getStatus()).to.equal(201);
+
+          expect(data.id).to.exist;
+          expect(data.email).to.exist;
+          expect(data.username).to.exist;
+          expect(data.isActive).to.be.true;
+        });
 
 settings:
   encodeUrl: true

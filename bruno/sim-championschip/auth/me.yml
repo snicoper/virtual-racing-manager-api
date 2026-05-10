@@ -7,6 +7,19 @@ http:
   method: GET
   url: "{{base-url}}/auth/me"
 
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        const data = res.getBody();
+
+        test("Should return authenticated user profile", () => {
+          expect(data.id).to.be.a("string");
+          expect(data.email).to.equal("salva@example.com");
+          expect(data.username).to.equal("snicoper");
+          expect(data.isActive).to.be.true;
+        });
+
 settings:
   encodeUrl: true
   timeout: 0

@@ -3,3 +3,5 @@ variables:
   - name: base-url
     value: |
       http://localhost:3000
+  - name: accessToken
+    value: ""

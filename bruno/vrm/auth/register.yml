@@ -10,10 +10,9 @@ http:
     type: json
     data: |-
       {
-        "email": "{{registerEmail}}-",
-        "username": "{{registerUsername}}-",
-        "password": "1",
-        "confirmPassword": "!"
+        "email": "{{registerEmail}}",
+        "password": "Password123!",
+        "confirmPassword": "Password123!"
       }
   auth: inherit
 
@@ -22,9 +21,9 @@ runtime:
     - type: before-request
       code: |-
         const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 10000);
 
-        bru.setVar('registerEmail', `test${timestamp}@example.com`);
-        bru.setVar('registerUsername', `test${timestamp}`);
+        bru.setVar('registerEmail', `test${timestamp}${random}@example.com`);
     - type: tests
       code: |-
         const data = res.getBody();
@@ -34,7 +33,6 @@ runtime:
 
           expect(data.id).to.exist;
           expect(data.email).to.exist;
-          expect(data.username).to.exist;
           expect(data.isActive).to.be.true;
         });
 

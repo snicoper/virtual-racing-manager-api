@@ -22,9 +22,15 @@ export class RegisterService {
       },
     });
 
-    const { passwordHash: _, ...safeUser } = user;
+    const registerResponse: RegisterResponse = {
+      id: user.id,
+      email: user.email,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
 
-    return safeUser;
+    return registerResponse;
   }
 
   private validatePassword(password: string, confirmPassword: string): void {

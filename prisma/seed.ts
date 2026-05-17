@@ -8,15 +8,17 @@ async function main(): Promise<void> {
 
   await prisma.user.create({
     data: {
-      email: 'salva@example.com',
+      email: 'alice@example.com',
       passwordHash: passwordHash,
+      emailVerifiedAt: new Date(),
     },
   });
 
   await prisma.user.create({
     data: {
-      email: 'alice@example.com',
+      email: 'bob@example.com',
       passwordHash: passwordHash,
+      emailVerifiedAt: new Date(),
     },
   });
 }

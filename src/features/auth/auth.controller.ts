@@ -12,6 +12,8 @@ import { JwtPayload } from './core/contracts/jwt-payload.contract';
 import { TokenResponse } from './core/contracts/token.response';
 import { JwtAuthGuard } from './core/guards/jwt-auth/jwt-auth.guard';
 import { JwtRefreshTokenGuard } from './core/guards/jwt-auth/jwt-refresh.guard';
+import { ForgotPasswordRequest } from './forgot-password/forgot-password.request';
+import { ForgotPasswordService } from './forgot-password/forgot-password.service';
 import { LoginRequest } from './login/login.request';
 import { LoginService } from './login/login.service';
 import { LogoutService } from './logout/logout.service';
@@ -25,6 +27,8 @@ import { RegisterService } from './register/register.service';
 import { ResendVerifyEmailRequest } from './resend-verify-email/resend-verify-email.request';
 import { ResendVerifyEmailResponse } from './resend-verify-email/resend-verify-email.response';
 import { ResendVerifyEmailService } from './resend-verify-email/resend-verify-email.service';
+import { ResetPasswordRequest } from './reset-password/reset-password.request';
+import { ResetPasswordService } from './reset-password/reset-password.service';
 import { VerifyEmailRequest } from './verify-email/verify-email.request';
 import { VerifyEmailService } from './verify-email/verify-email.service';
 
@@ -38,6 +42,8 @@ export class AuthController {
     private readonly verifyEmailService: VerifyEmailService,
     private readonly resendVerifyEmailService: ResendVerifyEmailService,
     private readonly logoutService: LogoutService,
+    private readonly forgotPasswordService: ForgotPasswordService,
+    private readonly resetPasswordService: ResetPasswordService,
   ) {}
 
   @Get('me')
@@ -65,6 +71,18 @@ export class AuthController {
     @Body() dto: ResendVerifyEmailRequest,
   ): Promise<ResendVerifyEmailResponse> {
     return this.resendVerifyEmailService.resendVerificationEmail(dto);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  forgotPassword(@Body() dto: ForgotPasswordRequest): Promise<void> {
+    return this.forgotPasswordService.forgotPassword(dto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  resetPassword(@Body() dto: ResetPasswordRequest): Promise<void> {
+    return this.resetPasswordService.resetPassword(dto);
   }
 
   @Post('login')

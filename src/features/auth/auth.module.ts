@@ -16,6 +16,8 @@ import { RefreshTokenService } from './refresh-token/refresh-token.service';
 import { RegisterService } from './register/register.service';
 import { ResendVerifyEmailService } from './resend-verify-email/resend-verify-email.service';
 import { VerifyEmailService } from './verify-email/verify-email.service';
+import { ForgotPasswordService } from './forgot-password/forgot-password.service';
+import { ResetPasswordService } from './reset-password/reset-password.service';
 
 const jwtExpiresIn =
   `${AppConfig.jwt.expiresInMinutes}m` as SignOptions['expiresIn'];
@@ -44,6 +46,8 @@ const jwtExpiresIn =
     VerifyEmailService,
     RefreshTokenService,
     ResendVerifyEmailService,
+    ForgotPasswordService,
+    ResetPasswordService,
   ],
 })
 export class AuthModule {}

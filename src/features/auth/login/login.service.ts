@@ -36,7 +36,7 @@ export class LoginService {
     if (!user) {
       throw new ConflictException({
         code: 'badRequest.invalidCredentials',
-        detail: 'Incorrect email or password 123123123123',
+        detail: 'Incorrect email or password',
       });
     }
 
@@ -45,7 +45,7 @@ export class LoginService {
     if (!isPasswordValid) {
       throw new ConflictException({
         code: 'badRequest.invalidCredentials',
-        detail: 'Incorrect email or password 123123123',
+        detail: 'Incorrect email or password',
       });
     }
 

@@ -2,6 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../../../prisma/prisma.service';
+import { userWithAuthorizationInclude } from '../../../core/database/includes/user-with-authorization.include';
 import { TokenResponse } from '../core/contracts/token.response';
 import { TokenService } from '../core/services/token.service';
 import { LoginRequest } from './login.request';
@@ -16,10 +17,11 @@ export class LoginService {
   async login(dto: LoginRequest): Promise<TokenResponse> {
     const normalizedEmail = dto.email.trim().toLowerCase();
 
-    const user: User | null = await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         email: normalizedEmail,
       },
+      include: userWithAuthorizationInclude,
     });
 
     await this.validateLoginAccount(dto.password, user);

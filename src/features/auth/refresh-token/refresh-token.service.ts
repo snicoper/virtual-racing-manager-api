@@ -4,6 +4,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { TokenResponse } from '../core/contracts/token.response';
 import { TokenService } from '../core/services/token.service';
 import { RefreshTokenRequest } from './refresh-token.request';
+import { userWithAuthorizationInclude } from '../../../core/database/includes/user-with-authorization.include';
 
 @Injectable()
 export class RefreshTokenService {
@@ -18,6 +19,7 @@ export class RefreshTokenService {
   ): Promise<TokenResponse> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
+      include: userWithAuthorizationInclude,
     });
 
     if (!user || !user?.refreshTokenHash) {

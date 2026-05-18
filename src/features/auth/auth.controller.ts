@@ -8,6 +8,9 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Permissions } from '../../core/authorization/decorators/permissions.decorator';
+import { PermissionsGuard } from '../../core/authorization/guards/permissions.guard';
+import { Permission } from '../../core/authorization/permission.enum';
 import { JwtPayload } from './core/contracts/jwt-payload.contract';
 import { TokenResponse } from './core/contracts/token.response';
 import { JwtAuthGuard } from './core/guards/jwt-auth/jwt-auth.guard';
@@ -48,7 +51,8 @@ export class AuthController {
   ) {}
 
   @Get('me')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(Permission.AuthRead)
   @HttpCode(HttpStatus.OK)
   me(@Req() req: Request & { user: JwtPayload }): Promise<MeResponse> {
     return this.meService.getMe(req.user.sub);
@@ -105,7 +109,8 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(Permission.AuthRead)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: Request & { user: JwtPayload }): Promise<void> {
     await this.logoutService.logout(req.user.sub);

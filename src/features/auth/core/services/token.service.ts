@@ -4,6 +4,7 @@ import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../../../../prisma/prisma.service';
 import { AppConfig } from '../../../../core/config/app.config';
+import { UserWithAuthorization } from '../../../../core/database/includes/user-with-authorization.include';
 import { RefreshToken } from '../contracts/refresh-token.contract';
 import { TokenResponse } from '../contracts/token.response';
 
@@ -14,7 +15,7 @@ export class TokenService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async issueTokens(user: User): Promise<TokenResponse> {
+  async issueTokens(user: UserWithAuthorization): Promise<TokenResponse> {
     const accessToken = await this.createAccessToken(user);
 
     const { refreshToken, refreshTokenHash } =
@@ -39,10 +40,26 @@ export class TokenService {
     });
   }
 
-  private async createAccessToken(user: User): Promise<string> {
+  private async createAccessToken(
+    user: UserWithAuthorization,
+  ): Promise<string> {
+    const roles = user.roles.map((userRole) => userRole.role.name);
+
+    const permissions = [
+      ...new Set(
+        user.roles.flatMap((userRole) =>
+          userRole.role.permissions.map(
+            (rolePermission) => rolePermission.permission.name,
+          ),
+        ),
+      ),
+    ];
+
     const payload = {
       sub: user.id,
       email: user.email,
+      roles,
+      permissions,
     };
 
     return this.jwtService.signAsync(payload);

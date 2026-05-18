@@ -1,3 +1,10 @@
 {
-  "cSpell.words": ["alice", "datasource", "postgresql", "Timestamptz", "uuid"]
+  "cSpell.words": [
+    "alice",
+    "datasource",
+    "lexi",
+    "postgresql",
+    "Timestamptz",
+    "uuid"
+  ]
 }

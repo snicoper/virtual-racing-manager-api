@@ -16,7 +16,7 @@ export class ForgotPasswordService {
     private readonly userMailTokenService: UserTokenMailService,
   ) {}
 
-  async forgotPassword(
+  async handle(
     request: ForgotPasswordRequest,
   ): Promise<ForgotPasswordResponse> {
     const user = await this.authRepository.findByEmail(request.email);

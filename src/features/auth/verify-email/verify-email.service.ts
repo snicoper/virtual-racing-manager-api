@@ -6,7 +6,7 @@ import { VerifyEmailRequest } from './verify-email.request';
 export class VerifyEmailService {
   constructor(private readonly userTokenService: UserTokenService) {}
 
-  async verifyEmail(request: VerifyEmailRequest): Promise<void> {
+  async handle(request: VerifyEmailRequest): Promise<void> {
     await this.userTokenService.consumeEmailVerificationToken(request.token);
   }
 }

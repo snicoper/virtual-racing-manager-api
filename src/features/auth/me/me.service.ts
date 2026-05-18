@@ -6,7 +6,7 @@ import { MeResponse } from './me.response';
 export class MeService {
   constructor(private readonly authRepository: AuthRepository) {}
 
-  async getMe(userId: string): Promise<MeResponse> {
+  async handle(userId: string): Promise<MeResponse> {
     const user = await this.authRepository.findById(userId);
 
     if (user === null) {

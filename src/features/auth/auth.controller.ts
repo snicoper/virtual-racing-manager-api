@@ -55,19 +55,19 @@ export class AuthController {
   @Permissions(Permission.UsersRead)
   @HttpCode(HttpStatus.OK)
   me(@Req() req: Request & { user: JwtPayload }): Promise<MeResponse> {
-    return this.meService.getMe(req.user.sub);
+    return this.meService.handle(req.user.sub);
   }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   register(@Body() dto: RegisterRequest): Promise<RegisterResponse> {
-    return this.registerService.register(dto);
+    return this.registerService.handle(dto);
   }
 
   @Post('verify-email')
   @HttpCode(HttpStatus.NO_CONTENT)
   verifyEmail(@Body() dto: VerifyEmailRequest): Promise<void> {
-    return this.verifyEmailService.verifyEmail(dto);
+    return this.verifyEmailService.handle(dto);
   }
 
   @Post('resend-verify-email')
@@ -75,7 +75,7 @@ export class AuthController {
   resendVerificationEmail(
     @Body() dto: ResendVerifyEmailRequest,
   ): Promise<ResendVerifyEmailResponse> {
-    return this.resendVerifyEmailService.resendVerificationEmail(dto);
+    return this.resendVerifyEmailService.handle(dto);
   }
 
   @Post('forgot-password')
@@ -83,19 +83,19 @@ export class AuthController {
   forgotPassword(
     @Body() dto: ForgotPasswordRequest,
   ): Promise<ForgotPasswordResponse> {
-    return this.forgotPasswordService.forgotPassword(dto);
+    return this.forgotPasswordService.handle(dto);
   }
 
   @Post('reset-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   resetPassword(@Body() dto: ResetPasswordRequest): Promise<void> {
-    return this.resetPasswordService.resetPassword(dto);
+    return this.resetPasswordService.handle(dto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   login(@Body() dto: LoginRequest): Promise<TokenResponse> {
-    return this.loginService.login(dto);
+    return this.loginService.handle(dto);
   }
 
   @Post('refresh-token')
@@ -105,7 +105,7 @@ export class AuthController {
     @Req() req: Request & { user: JwtPayload },
     @Body() dto: RefreshTokenRequest,
   ): Promise<TokenResponse> {
-    return this.refreshTokenService.refreshToken(dto, req.user.sub);
+    return this.refreshTokenService.handle(dto, req.user.sub);
   }
 
   @Post('logout')
@@ -113,6 +113,6 @@ export class AuthController {
   @Permissions(Permission.UsersRead)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: Request & { user: JwtPayload }): Promise<void> {
-    await this.logoutService.logout(req.user.sub);
+    await this.logoutService.handle(req.user.sub);
   }
 }

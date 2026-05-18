@@ -90,13 +90,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private getDefaultCode(status: number): string {
     switch (status) {
       case 400:
-        return 'bad_request';
+        return 'badRequest';
       case 401:
         return 'unauthorized';
       case 403:
         return 'forbidden';
       case 404:
-        return 'not_found';
+        return 'notFound';
       case 409:
         return 'conflict';
       default:

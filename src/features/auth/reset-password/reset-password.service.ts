@@ -6,7 +6,7 @@ import { ResetPasswordRequest } from './reset-password.request';
 export class ResetPasswordService {
   constructor(private readonly userTokenService: UserTokenService) {}
 
-  async resetPassword(request: ResetPasswordRequest): Promise<void> {
+  async handle(request: ResetPasswordRequest): Promise<void> {
     if (request.password !== request.confirmPassword) {
       throw new BadRequestException({
         errors: {

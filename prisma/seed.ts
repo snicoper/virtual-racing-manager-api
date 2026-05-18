@@ -145,6 +145,33 @@ async function seedUsers(): Promise<void> {
   }
 }
 
+async function seedUserProfiles(): Promise<void> {
+  const alice = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: 'alice@example.com',
+    },
+  });
+
+  await prisma.userProfile.upsert({
+    where: {
+      userId: alice.id,
+    },
+
+    update: {},
+
+    create: {
+      userId: alice.id,
+      slug: 'alice',
+      nickname: 'Alice',
+      firstName: 'Alice',
+      lastName: 'Johnson',
+      country: 'USA',
+      bio: 'Sim racing enthusiast',
+      avatarUrl: null,
+    },
+  });
+}
+
 /*********************************
  * UserRoles
  ********************************/
@@ -275,6 +302,7 @@ async function main(): Promise<void> {
   await seedRoles();
   await seedRolePermissions();
   await seedUsers();
+  await seedUserProfiles();
   await seedUserRoles();
   await seedOrganization();
 }

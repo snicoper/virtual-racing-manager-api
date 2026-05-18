@@ -5,7 +5,7 @@ import { TokenService } from '../core/services/token.service';
 export class LogoutService {
   constructor(private readonly tokenService: TokenService) {}
 
-  async logout(userId: string): Promise<void> {
+  async handle(userId: string): Promise<void> {
     await this.tokenService.clearRefreshToken(userId);
   }
 }

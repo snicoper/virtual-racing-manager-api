@@ -12,7 +12,7 @@ export class RefreshTokenService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async refreshToken(
+  async handle(
     refreshTokenRequest: RefreshTokenRequest,
     userId: string,
   ): Promise<TokenResponse> {

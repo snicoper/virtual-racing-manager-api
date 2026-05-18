@@ -13,7 +13,7 @@ export class LoginService {
     private readonly authService: TokenService,
   ) {}
 
-  async login(dto: LoginRequest): Promise<TokenResponse> {
+  async handle(dto: LoginRequest): Promise<TokenResponse> {
     const normalizedEmail = dto.email.trim().toLowerCase();
 
     const user =

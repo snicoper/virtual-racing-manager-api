@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { PrismaService } from '../../../../prisma/prisma.service';
+import { AuthRepository } from '../core/repositories/auth.repository';
 import { UserTokenMailService } from '../core/services/user-token-mail.service';
 import { UserTokenService } from '../core/services/user-token.service';
 import { UserTokenType } from '../core/types/user-token.type';
@@ -10,7 +10,7 @@ import { ResendVerifyEmailResponse } from './resend-verify-email.response';
 @Injectable()
 export class ResendVerifyEmailService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
     private readonly userTokenService: UserTokenService,
     private readonly userMailTokenService: UserTokenMailService,
   ) {}
@@ -20,12 +20,8 @@ export class ResendVerifyEmailService {
   ): Promise<ResendVerifyEmailResponse> {
     const normalizedEmail = dto.email.trim().toLowerCase();
 
-    const user = await this.prisma.user.findUnique({
-      where: {
-        email: normalizedEmail,
-        emailVerifiedAt: null,
-      },
-    });
+    const user =
+      await this.authRepository.findUnverifiedByEmail(normalizedEmail);
 
     const resentVerifyEmailResponse: ResendVerifyEmailResponse = {};
 

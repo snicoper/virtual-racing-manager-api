@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { PrismaService } from '../../../../prisma/prisma.service';
+import { AuthRepository } from '../core/repositories/auth.repository';
 import { UserTokenMailService } from '../core/services/user-token-mail.service';
 import { UserTokenService } from '../core/services/user-token.service';
 import { UserTokenType } from '../core/types/user-token.type';
@@ -10,7 +10,7 @@ import { ForgotPasswordResponse } from './forgot-password.response';
 @Injectable()
 export class ForgotPasswordService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
     private readonly userTokenService: UserTokenService,
     private readonly userMailTokenService: UserTokenMailService,
   ) {}
@@ -18,10 +18,7 @@ export class ForgotPasswordService {
   async forgotPassword(
     request: ForgotPasswordRequest,
   ): Promise<ForgotPasswordResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: request.email },
-    });
-
+    const user = await this.authRepository.findByEmail(request.email);
     const forgotPasswordResponse: ForgotPasswordResponse = {};
 
     if (!user) {

@@ -1,15 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../../../prisma/prisma.service';
 import { TokenResponse } from '../core/contracts/token.response';
+import { AuthRepository } from '../core/repositories/auth.repository';
 import { TokenService } from '../core/services/token.service';
 import { RefreshTokenRequest } from './refresh-token.request';
-import { userWithAuthorizationInclude } from '../../../core/database/includes/user-with-authorization.include';
 
 @Injectable()
 export class RefreshTokenService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
     private readonly tokenService: TokenService,
   ) {}
 
@@ -17,10 +16,7 @@ export class RefreshTokenService {
     refreshTokenRequest: RefreshTokenRequest,
     userId: string,
   ): Promise<TokenResponse> {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      include: userWithAuthorizationInclude,
-    });
+    const user = await this.authRepository.findByIdWithAuthorization(userId);
 
     if (!user || !user?.refreshTokenHash) {
       throw new UnauthorizedException({

@@ -2,12 +2,12 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { UserToken } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { createHash, randomBytes } from 'crypto';
-import { PrismaService } from '../../../../../prisma/prisma.service';
+import { UserTokenRepository } from '../repositories/user-token.repository';
 import { UserTokenType } from '../types/user-token.type';
 
 @Injectable()
 export class UserTokenService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly userTokenRepository: UserTokenRepository) {}
 
   async createUserToken(
     userId: string,
@@ -17,15 +17,13 @@ export class UserTokenService {
     const token = randomBytes(32).toString('hex');
     const tokenHash = createHash('sha256').update(token).digest('hex');
 
-    await this.prisma.userToken.create({
-      data: {
-        userId,
-        email,
-        type: userTokenType,
-        tokenHash,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      },
-    });
+    await this.userTokenRepository.create(
+      userId,
+      email,
+      userTokenType,
+      tokenHash,
+      new Date(Date.now() + 1000 * 60 * 60 * 24),
+    );
 
     return token;
   }
@@ -33,10 +31,7 @@ export class UserTokenService {
   async consumeToken(token: string, type: UserTokenType): Promise<void> {
     const userToken = await this.getUserToken(token, type);
 
-    await this.prisma.userToken.update({
-      where: { id: userToken.id },
-      data: { usedAt: new Date() },
-    });
+    await this.userTokenRepository.updateUsedAtNow(userToken.id);
   }
 
   async consumeEmailVerificationToken(token: string): Promise<void> {
@@ -45,19 +40,10 @@ export class UserTokenService {
       UserTokenType.EMAIL_VERIFICATION,
     );
 
-    const now = new Date();
-
-    await this.prisma.$transaction([
-      this.prisma.userToken.update({
-        where: { id: userToken.id },
-        data: { usedAt: now },
-      }),
-
-      this.prisma.user.update({
-        where: { id: userToken.userId! },
-        data: { emailVerifiedAt: now },
-      }),
-    ]);
+    await this.userTokenRepository.consumeEmailVerificationToken(
+      userToken.id,
+      userToken.userId!,
+    );
   }
 
   async consumePasswordResetToken(
@@ -71,17 +57,11 @@ export class UserTokenService {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    await this.prisma.$transaction([
-      this.prisma.userToken.update({
-        where: { id: userToken.id },
-        data: { usedAt: new Date() },
-      }),
-
-      this.prisma.user.update({
-        where: { id: userToken.userId! },
-        data: { passwordHash, refreshTokenHash: null },
-      }),
-    ]);
+    await this.userTokenRepository.consumePasswordResetToken(
+      userToken.id,
+      userToken.userId!,
+      passwordHash,
+    );
   }
 
   private async getUserToken(
@@ -90,14 +70,10 @@ export class UserTokenService {
   ): Promise<UserToken> {
     const tokenHash = createHash('sha256').update(token).digest('hex');
 
-    const userToken = await this.prisma.userToken.findFirst({
-      where: {
-        tokenHash,
-        type: type,
-        expiresAt: { gt: new Date() },
-        usedAt: null,
-      },
-    });
+    const userToken = await this.userTokenRepository.findActiveTokenByTokenHash(
+      tokenHash,
+      type,
+    );
 
     if (!userToken) {
       throw new ConflictException('Invalid or expired token');

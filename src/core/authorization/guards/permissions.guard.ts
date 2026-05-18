@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PrismaService } from '../../../../prisma/prisma.service';
-import { userWithAuthorizationInclude } from '../../database/includes/user-with-authorization.include';
+import { AuthRepository } from '../../../features/auth/core/repositories/auth.repository';
 import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 import { AuthenticatedRequest } from '../interfaces/authenticated-request.interface';
 
@@ -9,7 +8,7 @@ import { AuthenticatedRequest } from '../interfaces/authenticated-request.interf
 export class PermissionsGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -29,10 +28,9 @@ export class PermissionsGuard implements CanActivate {
       return false;
     }
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: requestUser.sub },
-      include: userWithAuthorizationInclude,
-    });
+    const user = await this.authRepository.findByIdWithAuthorization(
+      requestUser.sub,
+    );
 
     if (!user) {
       return false;

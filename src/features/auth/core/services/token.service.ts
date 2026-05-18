@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../../../../prisma/prisma.service';
 import { AppConfig } from '../../../../core/config/app.config';
 import { UserWithAuthorization } from '../../../../core/database/includes/user-with-authorization.include';
 import { RefreshToken } from '../contracts/refresh-token.contract';
 import { TokenResponse } from '../contracts/token.response';
+import { AuthRepository } from '../repositories/auth.repository';
 
 @Injectable()
 export class TokenService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -21,10 +21,7 @@ export class TokenService {
     const { refreshToken, refreshTokenHash } =
       await this.createRefreshToken(user);
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { refreshTokenHash },
-    });
+    await this.authRepository.updateRefreshTokenHash(user.id, refreshTokenHash);
 
     return {
       accessToken,
@@ -34,10 +31,7 @@ export class TokenService {
   }
 
   async clearRefreshToken(userId: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshTokenHash: null },
-    });
+    await this.authRepository.updateRefreshTokenHash(userId, null);
   }
 
   private async createAccessToken(

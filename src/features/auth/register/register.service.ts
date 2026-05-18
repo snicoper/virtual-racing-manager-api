@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../../../../prisma/prisma.service';
+import { AuthRepository } from '../core/repositories/auth.repository';
 import { UserTokenMailService } from '../core/services/user-token-mail.service';
 import { UserTokenService } from '../core/services/user-token.service';
 import { UserTokenType } from '../core/types/user-token.type';
@@ -11,7 +11,7 @@ import { RegisterResponse } from './register.response';
 @Injectable()
 export class RegisterService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly authRepository: AuthRepository,
     private readonly userTokenService: UserTokenService,
     private readonly userMailTokenService: UserTokenMailService,
   ) {}
@@ -40,12 +40,7 @@ export class RegisterService {
   }
 
   private async createUser(email: string, passwordHash: string): Promise<User> {
-    return this.prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-      },
-    });
+    return this.authRepository.createNewUser(email, passwordHash);
   }
 
   private async createTokenAndSendEmail(
@@ -76,24 +71,14 @@ export class RegisterService {
   private async validateUserDoesNotExist(email: string): Promise<void | null> {
     const errors: Record<string, string[]> = {};
 
-    const existingUser = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email }],
-      },
-    });
+    const user = await this.authRepository.findByEmail(email);
 
-    if (existingUser === null) {
-      return null;
-    }
-
-    if (existingUser.email === email) {
+    if (user) {
       errors.email = ['userAlreadyExists'];
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new BadRequestException({
-        errors: errors,
-      });
+      throw new BadRequestException({ errors });
     }
   }
 }

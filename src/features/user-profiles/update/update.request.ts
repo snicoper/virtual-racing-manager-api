@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { IsSlugField } from '../../../core/validators/custom-validator';
+import { IsSlugField } from '../../../core/validators/field.validators';
 
 export class UpdateRequest {
   @IsString()

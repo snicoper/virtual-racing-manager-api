@@ -1,5 +1,5 @@
 /** Global regex patterns. */
-const RegexUtils = {
+export const RegexUtils = {
   email:
     /^(?![.-])([\w.-]+)(?<![.-])@(?![.-])([\w-]+)(?<![.-])((\.([a-zA-Z]){2,3})+)$/,
 
@@ -7,5 +7,3 @@ const RegexUtils = {
 
   slug: /^(?!-)(?!.*--)[a-z0-9-]{3,30}(?<!-)$/,
 };
-
-export default RegexUtils;

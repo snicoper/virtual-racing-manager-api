@@ -1,4 +1,4 @@
-import { IsEmailField } from '../../../core/validators/custom-validator';
+import { IsEmailField } from '../../../core/validators/field.validators';
 
 export class ForgotPasswordRequest {
   @IsEmailField()

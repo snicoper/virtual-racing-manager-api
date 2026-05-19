@@ -17,6 +17,8 @@ import { Permission } from '../../core/security/types/permission.enum';
 import { GetBySlugRequest } from './get-by-slug/get-by-slug.request';
 import { GetBySlugResponse } from './get-by-slug/get-by-slug.response';
 import { GetBySlugService } from './get-by-slug/get-by-slug.service';
+import { MeResponse } from './me/me.response';
+import { MeService } from './me/me.service';
 import { SlugAvailabilityRequest } from './slug-availability/slug-availability.request';
 import { SlugAvailabilityResponse } from './slug-availability/slug-availability.response';
 import { SlugAvailabilityService } from './slug-availability/slug-availability.service';
@@ -30,6 +32,7 @@ export class UserProfilesController {
     private readonly getBySlugService: GetBySlugService,
     private readonly updateService: UpdateService,
     private readonly slugAvailabilityService: SlugAvailabilityService,
+    private readonly meService: MeService,
   ) {}
 
   @Get('slug-availability/:slug')
@@ -38,6 +41,16 @@ export class UserProfilesController {
     @Param() request: SlugAvailabilityRequest,
   ): Promise<SlugAvailabilityResponse> {
     return this.slugAvailabilityService.handle(request.slug);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions(Permission.UserProfilesRead)
+  @HttpCode(HttpStatus.OK)
+  getMe(
+    @Req() req: Request & { user: JwtPayload },
+  ): Promise<MeResponse | null> {
+    return this.meService.handle(req.user.sub);
   }
 
   @Get(':slug')

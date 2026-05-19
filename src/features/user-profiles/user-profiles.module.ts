@@ -5,6 +5,7 @@ import { GetBySlugService } from './get-by-slug/get-by-slug.service';
 import { SlugAvailabilityService } from './slug-availability/slug-availability.service';
 import { UpdateService } from './update/update.service';
 import { UserProfilesController } from './user-profiles.controller';
+import { MeService } from './me/me.service';
 
 @Module({
   controllers: [UserProfilesController],
@@ -13,6 +14,7 @@ import { UserProfilesController } from './user-profiles.controller';
     GetBySlugService,
     UpdateService,
     SlugAvailabilityService,
+    MeService,
   ],
   imports: [SecurityModule],
 })

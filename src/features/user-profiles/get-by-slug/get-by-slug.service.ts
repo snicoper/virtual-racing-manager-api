@@ -26,8 +26,6 @@ export class GetBySlugService {
       country: userProfile.country,
       bio: userProfile.bio,
       avatarUrl: userProfile.avatarUrl,
-      createdAt: userProfile.createdAt,
-      updatedAt: userProfile.updatedAt,
     };
 
     return result;

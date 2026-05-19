@@ -1,4 +1,4 @@
-export interface GetBySlugResponse {
+export interface MeResponse {
   id: string;
   userId: string;
   slug: string;
